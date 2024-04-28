@@ -1,9 +1,15 @@
 import { geraListaDeRetorno } from "./src/investimentGoals";
 
 const btnCalculaMontante = document.querySelector("#calculaMontante");
+const btnLimpaFormulario = document.querySelector("#limpaFormulario");
 const form = document.getElementsByTagName("form")[0];
 
-function renderizaProgressaoInvestimento() {
+function renderizaProgressaoInvestimento(evt) {
+  evt.preventDefault();
+  if(document.querySelector('.error')){
+    return;
+  }
+
   const inputCapital = Number(
     document.querySelector("#capital").value.replace(",", ".")
   );
@@ -38,9 +44,9 @@ function validarCampos(evt) {
   const grandParentElement = evt.target.parentElement.parentElement;
   const inputValue = evt.target.value.replace(",", ".");
 
-  if (
-    isNaN(inputValue) ||
-    (inputValue <= 0 && !parentElement.classList.contains("error"))
+  if (!parentElement.classList.contains("error") &&
+    (isNaN(inputValue) ||
+    (inputValue <= 0) )
   ) {
     if (evt.target.getAttribute("id") === "capitalAdicional") {
       if (Number(inputValue) === 0) return;
@@ -61,13 +67,25 @@ function validarCampos(evt) {
   }
 }
 
+function limparFormulario(){
+  form['capital'].value = '';
+  form['capitalAdicional'].value = '';
+  form['prazo'].value = '';
+  form['taxa'].value = '';
+
+  const listaCamposErros = document.querySelectorAll('.error');
+
+  for(let campoErrado of listaCamposErros){
+    campoErrado.classList.remove('error');
+    campoErrado.parentElement.querySelector('p').remove();
+  }
+}
+
 for (const formElement of form) {
   if (formElement.tagName === "INPUT" && formElement.hasAttribute("name")) {
     formElement.addEventListener("blur", validarCampos);
   }
 }
 
-btnCalculaMontante.addEventListener("click", (evt) => {
-  evt.preventDefault();
-  renderizaProgressaoInvestimento();
-});
+btnCalculaMontante.addEventListener("click",renderizaProgressaoInvestimento);
+btnLimpaFormulario.addEventListener("click",limparFormulario);
